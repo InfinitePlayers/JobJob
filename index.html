@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>London Videographer Job Board</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      margin: 0;
+      padding: 20px;
+    }
+    header {
+      background-color: #111;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+    }
+    .job {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin: 10px 0;
+    }
+    .job h2 {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+    }
+    .job p {
+      margin: 5px 0;
+      color: #555;
+    }
+    .job a {
+      text-decoration: none;
+      color: #0066cc;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📹 Latest Videographer & Producer Jobs – London</h1>
+    <p>Updated live from Indeed (RSS feed)</p>
+  </header>
+
+  <div id="job-list"></div>
+
+  <script>
+    async function fetchRSS() {
+      const rssURL = "https://www.indeed.co.uk/rss?q=videographer&l=London";
+      const apiURL = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssURL)}`;
+
+      try {
+        const res = await fetch(apiURL);
+        const data = await res.json();
+
+        const container = document.getElementById("job-list");
+        container.innerHTML = '';
+
+        data.items.slice(0, 10).forEach(item => {
+          const job = document.createElement("div");
+          job.className = "job";
+          job.innerHTML = `
+            <h2><a href="${item.link}" target="_blank">${item.title}</a></h2>
+            <p><strong>Posted:</strong> ${new Date(item.pubDate).toLocaleDateString()}</p>
+            <p>${item.description.split("<br>")[0]}</p>
+          `;
+          container.appendChild(job);
+        });
+
+      } catch (error) {
+        document.getElementById("job-list").innerHTML = '<p>Failed to fetch jobs. Please try again later.</p>';
+        console.error("Error fetching RSS:", error);
+      }
+    }
+
+    fetchRSS();
+  </script>
+</body>
+</html>
